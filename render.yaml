@@ -1,0 +1,42 @@
+# Render Blueprint for the eStore Django app
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: estore
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
+    startCommand: "gunicorn ecommerce.wsgi:application"
+    healthCheckPath: "/"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13"
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      # DATABASE_URL is injected automatically from the Render Postgres below.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: estore-db
+          property: connectionString
+      # Safaricom Daraja (M-Pesa) sandbox credentials - set in the dashboard.
+      - key: MPESA_ENVIRONMENT
+        value: "sandbox"
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_SHORTCODE
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_CALLBACK_URL
+        sync: false
+
+databases:
+  - name: estore-db
+    plan: free
+    databaseName: estore
+    user: estore
+    region: oregon

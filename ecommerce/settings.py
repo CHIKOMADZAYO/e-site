@@ -36,7 +36,19 @@ if not SECRET_KEY and DEBUG:
 elif not SECRET_KEY and not DEBUG:
     raise ImproperlyConfigured("SECRET_KEY environment variable is required in production")
 
-ALLOWED_HOSTS =['.vercel.app','localhost']
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
+    'ALLOWED_HOSTS', 'localhost,127.0.0.1'
+).split(',') if h.strip()]
+for _host in ('.onrender.com', '.vercel.app'):
+    if _host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_host)
+
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get(
+    'CSRF_TRUSTED_ORIGINS', ''
+).split(',') if o.strip()]
+for _origin in ('https://*.onrender.com', 'https://*.vercel.app'):
+    if _origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_origin)
 
 # Application definition
 
@@ -89,23 +101,13 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-#         conn_max_age=600,
-#     )
-# }
-
+# Uses DATABASE_URL (PostgreSQL, e.g. Render Postgres) when set,
+# otherwise falls back to local SQLite for development.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',
-        'USER': 'neondb_owner',
-        'PASSWORD': 'npg_V0q8KwaJEUeW',
-        'HOST': 'ep-late-shape-bcb19fep-pooler.c-16.us-east-1.aws.neon.tech',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+        conn_max_age=600,
+    )
 }
 
 # Password validation
