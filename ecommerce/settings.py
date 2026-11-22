@@ -110,6 +110,17 @@ DATABASES = {
     )
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'estore_b4gv',
+        'USER': 'estore',
+        'PASSWORD': 'lmnCzrygwgcYdEjxg9RKAdgzNmEhSFNA',
+        'HOST': 'postgresql://estore:lmnCzrygwgcYdEjxg9RKAdgzNmEhSFNA@dpg-dc1ft9jl550s73ed1bng-a/estore_b4gv',
+        'PORT': '5432',
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
