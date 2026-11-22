@@ -157,7 +157,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_ROOT can be overridden by env var so it points at a mounted
+# persistent disk on Render (must equal the disk mountPath).
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT') or (BASE_DIR / 'media')
 
 # Vercel Blob Storage for media on Vercel (read-only filesystem)
 USE_VERCEL_BLOB = bool(
